@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>躁动的小球</title>
+		<style>
+			#wrap{
+				width: 1000px;
+				height: 600px;
+				margin: 0 auto;
+				box-shadow: 0 0 20px #000;
+				position: relative;
+			}
+			#wrap>div{
+				position: absolute;
+				border-radius:50%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="wrap"></div>
+		<script>
+		//工厂模式创建小球
+			//获取元素
+			var wrap = document.getElementById('wrap');
+			//全局变量
+			var minsize = 20,maxsize = 40;//小球大小范围
+			var minspeed = -4,maxspeed=3;//小球速度范围
+			var ballnum = 200;//小球数量
+			var ballArr = [];//所有小球对象的数组
+			//随机数的函数
+			function rN(min,max){
+				return Math.round(Math.random()*(max-min)+min);
+			}
+			function initBall(size,bg,initx,inity,speedx,speedy){
+				//大小 颜色  出生位置 X速度  Y速度 移动（碰壁反弹）
+				var ball = document.createElement('div');
+				ball.style.width = size + 'px';
+				ball.style.height = size + 'px';
+				ball.style.background = bg;
+				ball.style.top = inity+'px';
+				ball.style.left = initx+'px';
+				ball.speedx = speedx;
+				ball.speedy = speedy;
+				ball.move = function(){
+					//计算小球到达即将要设置的left和top
+					var l = ball.offsetLeft + ball.speedx;
+					var t = ball.offsetTop + ball.speedy;
+					
+//					//判断，判断小球到达反弹边界
+					if(l < 0 || l > wrap.offsetWidth-ball.offsetWidth){
+						ball.speedx *= -1;
+					}
+					if(t < 0 || t > wrap.offsetHeight-ball.offsetHeight){
+						ball.speedy *= -1;
+					}
+					
+					//设置
+					ball.style.top = t + 'px';
+					ball.style.left = l + 'px';
+				};
+				return ball;
+			}
+			//创建一个小球
+			function createBall(){
+				//用随机函数获取大小，颜色，偏移量
+				var size = rN(minsize,maxsize);
+				var bg = '#'+String(Math.random()).substr(2,6);
+				var initx = rN(0,wrap.offsetWidth-size);
+				var inity = rN(0,wrap.offsetHeight-size);
+				var speedx = rN(minspeed,maxspeed);
+				speedx= speedx == 0 ? 1 : speedx;
+				var speedy = rN(minspeed,maxspeed);
+				speedy = speedy == 0 ? -1 : speedy;
+				var ball = initBall(size,bg,initx,inity,speedx,speedy);
+				wrap.appendChild(ball);
+				ballArr.push(ball);
+			}
+			//创建大量小球
+			function createManyBalls(){
+				for(var i=0;i<ballnum;i++){
+					createBall();
+				}
+			}
+			createManyBalls();
+			
+			function run(){
+				//调用所有小球的函数
+				for(i in ballArr){
+					ballArr[i].move();
+				}
+				window.requestAnimationFrame(run);
+			};
+			 run();
+			
+		</script>
+	</body>
+</html>
